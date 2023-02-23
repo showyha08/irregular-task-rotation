@@ -12,6 +12,7 @@ export default function Home() {
   let ref = useRef("");
   // const peopleName = ["", "", "", "", ""];
   // const peopleNameRef = useRef(peopleName);
+  
   function handleClick() {
     console.log(ref.current.toString);
   }
