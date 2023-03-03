@@ -1,19 +1,19 @@
 import { ChangeEventHandler } from "react";
-import { Pic } from "./svg/pic";
-import { Wait } from "./svg/wait";
+import { Pic } from "../svg/pic";
+import { Wait } from "../svg/wait";
 
-export const Person = ({
+export const Member = ({
   isActive,
   onChange,
 }: {
   isActive: boolean;
   onChange: ChangeEventHandler<HTMLInputElement>;
 }): JSX.Element => {
-  const activePerson = <Pic></Pic>;
-  const waitingPerson = <Wait></Wait>;
+  const activeMember = <Pic></Pic>;
+  const waitingMember = <Wait></Wait>;
   return (
     <div>
-      {isActive ? activePerson : waitingPerson}
+      {isActive ? activeMember : waitingMember}
       <input
         type="text"
         placeholder="名前を入力してください"
@@ -23,4 +23,4 @@ export const Person = ({
   );
 };
 
-export default Person;
+export default Member;

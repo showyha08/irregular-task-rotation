@@ -10,7 +10,7 @@ type ComponenProps = {
   disableClickForMinus?: boolean;
 };
 
-const PersonController = ({
+const MemberController = ({
   children,
   onClickForPlus,
   onClickForMinus,
@@ -36,4 +36,4 @@ const PersonController = ({
   );
 };
 
-export default PersonController;
+export default MemberController;

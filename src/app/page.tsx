@@ -1,37 +1,55 @@
 "use client";
 
 import { ChangeButton } from "components/atoms/changeButton";
-import PersonController from "components/molcule/personController";
-import Person from "components/person";
-import { useRouter } from "next/router";
+import MemberController from "components/molcule/memberController";
+import Member from "components/atoms/member";
 import { useRef, useState } from "react";
+import ExportButton from "components/atoms/exportButton";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
-  const [personCount, setPersoncount] = useState(3);
-  const [activePersonNo, setActivePersonNo] = useState(1);
+  // メンバー許容人数設定
+  const MIN_COUNT = 1;
+  const MAX_COUNT = 5;
+  const INIT_COUNT = 3;
+  const isInRange = (x: number) => {
+    return MIN_COUNT <= x && x <= MAX_COUNT;
+  };
+
+  // パラメータから状態を取得
+  const searchParams = useSearchParams();
+  const position = searchParams.get("position");
+  let members: string[] = [];
+  [...Array(MAX_COUNT)].map((_, x) => {
+    const member = searchParams.get(`member${++x}`);
+    typeof member === "string" && members.push(member);
+  });
+  const [memberCount, setMembercount] = useState(INIT_COUNT);
+
+  // クエリストリングでの位置指定
+  const [activeMemberNo, setActiveMemberNo] = useState(
+    (isInRange(Number(position)) && Number(position)) || 1
+  );
   let ref = useRef("");
-  // const peopleName = ["", "", "", "", ""];
-  // const peopleNameRef = useRef(peopleName);
-  
+
   function handleClick() {
     console.log(ref.current.toString);
   }
-  const minCount = 1;
-  const maxCount = 5;
+
   const canCountDown: () => boolean = () => {
-    return minCount < personCount && personCount <= maxCount;
+    return MIN_COUNT < memberCount && memberCount <= MAX_COUNT;
   };
   const canCountUp: () => boolean = () => {
-    return minCount <= personCount && personCount < maxCount;
+    return MIN_COUNT <= memberCount && memberCount < MAX_COUNT;
   };
-  const activePersonBack: () => void = () => {
-    setActivePersonNo(
-      activePersonNo - 1 < minCount ? personCount : activePersonNo - 1
+  const activeMemberBack: () => void = () => {
+    setActiveMemberNo(
+      activeMemberNo - 1 < MIN_COUNT ? memberCount : activeMemberNo - 1
     );
   };
-  const activePersonNext: () => void = () => {
-    setActivePersonNo(
-      activePersonNo + 1 > personCount ? minCount : activePersonNo + 1
+  const activeMemberNext: () => void = () => {
+    setActiveMemberNo(
+      activeMemberNo + 1 > memberCount ? MIN_COUNT : activeMemberNo + 1
     );
   };
 
@@ -42,43 +60,46 @@ export default function Home() {
       </h1>
       <div className="">
         <div className="flex justify-center">
-          {[...Array(personCount)].map((_, x) => {
+          {[...Array(memberCount)].map((_, x) => {
             return (
-              <Person
+              <Member
                 key={x}
-                isActive={++x === activePersonNo}
+                isActive={++x === activeMemberNo}
                 onChange={handleClick}
-              ></Person>
+              ></Member>
             );
           })}
         </div>
         <div className="flex justify-center p-10">
-          <PersonController
+          <MemberController
             onClickForMinus={() =>
-              setPersoncount(() =>
-                canCountDown() ? personCount - 1 : personCount
+              setMembercount(() =>
+                canCountDown() ? memberCount - 1 : memberCount
               )
             }
             onClickForPlus={() =>
-              setPersoncount(() =>
-                canCountUp() ? personCount + 1 : personCount
+              setMembercount(() =>
+                canCountUp() ? memberCount + 1 : memberCount
               )
             }
             disableClickForMinus={!canCountDown()}
             disableClickForPlus={!canCountUp()}
           >
-            {personCount}
-          </PersonController>
+            {memberCount}
+          </MemberController>
         </div>
         <div className="flex justify-center p-10">
           <ChangeButton
             color="back"
-            onClick={() => activePersonBack()}
+            onClick={() => activeMemberBack()}
           ></ChangeButton>
           <ChangeButton
             color="next"
-            onClick={() => activePersonNext()}
+            onClick={() => activeMemberNext()}
           ></ChangeButton>
+        </div>
+        <div className="grid place-items-center p-10">
+          <ExportButton onClick={() => activeMemberNext()}></ExportButton>
         </div>
       </div>
     </main>

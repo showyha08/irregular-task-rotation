@@ -21,7 +21,7 @@ export const Wait = (): JSX.Element => {
             strokeLinejoin="bevel"
           />
           <circle cx="99" cy="90" r="38" fill="black" />
-          <g clip-path="url(#clip0_413_1101)">
+          <g clipPath="url(#clip0_413_1101)">
             <g filter="url(#filter0_d_413_1101)">
               <path d="M99.5 69L135.44 201H63.5599L99.5 69Z" fill="black" />
               <path
