@@ -5,9 +5,11 @@ import { Wait } from "../svg/wait";
 export const Member = ({
   isActive,
   onChange,
+  value,
 }: {
   isActive: boolean;
   onChange: ChangeEventHandler<HTMLInputElement>;
+  value: string;
 }): JSX.Element => {
   const activeMember = <Pic></Pic>;
   const waitingMember = <Wait></Wait>;
@@ -18,6 +20,7 @@ export const Member = ({
         type="text"
         placeholder="名前を入力してください"
         onChange={onChange}
+        value={value}
       />
     </div>
   );

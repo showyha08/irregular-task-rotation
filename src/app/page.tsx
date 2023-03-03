@@ -19,11 +19,7 @@ export default function Home() {
   // パラメータから状態を取得
   const searchParams = useSearchParams();
   const position = searchParams.get("position");
-  let members: string[] = [];
-  [...Array(MAX_COUNT)].map((_, x) => {
-    const member = searchParams.get(`member${++x}`);
-    typeof member === "string" && members.push(member);
-  });
+  const members: string[] = searchParams.get("member")?.split(",") || [];
   const [memberCount, setMembercount] = useState(INIT_COUNT);
 
   // クエリストリングでの位置指定
@@ -64,6 +60,7 @@ export default function Home() {
             return (
               <Member
                 key={x}
+                value={members[x]}
                 isActive={++x === activeMemberNo}
                 onChange={handleClick}
               ></Member>
