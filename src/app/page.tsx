@@ -6,8 +6,40 @@ import Member from "components/atoms/member";
 import { useRef, useState } from "react";
 import ExportButton from "components/atoms/exportButton";
 import { useSearchParams } from "next/navigation";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { supabase } from "../utils/supabaseClient";
+import type { ReactNode } from "react";
+import React from "react";
 
 export default function Home() {
+  const session = useSession();
+  type Props = {
+    children: ReactNode;
+  };
+  const Container = (props: Props) => {
+    const { user } = Auth.useUser();
+    // ログインしている場合
+    if (user) {
+      return (
+        <div>
+          <div>OK</div>
+          <div className="mx-2 my-4 flex justify-end"></div>
+        </div>
+      );
+    }
+    // ログインしていない場合
+    return props.children;
+  };
+  const App = () => (
+    <Auth
+      supabaseClient={supabase}
+      appearance={{ theme: ThemeSupa }}
+      theme="dark"
+    />
+  );
+
   // メンバー許容人数設定
   const MIN_COUNT = 1;
   const MAX_COUNT = 5;
@@ -18,6 +50,7 @@ export default function Home() {
 
   // パラメータから状態を取得
   const searchParams = useSearchParams();
+  const title = searchParams.get("title") || "タスク当番表(変更可能)";
   const position = searchParams.get("position");
   const members: string[] = searchParams.get("member")?.split(",") || [];
   const [memberCount, setMembercount] = useState(INIT_COUNT);
@@ -51,8 +84,30 @@ export default function Home() {
 
   return (
     <main className="">
+      <Auth.UserContextProvider supabaseClient={supabase}>
+        <Container>
+          <div className="flex justify-center pt-8">
+            <div className="w-full sm:w-96">
+              <App></App>
+            </div>
+          </div>
+        </Container>
+      </Auth.UserContextProvider>
+      <button onClick={() => supabase.auth.signOut()}>Sign out</button>;
+      {/* <div className="container" style={{ padding: "50px 0 100px 0" }}>
+        {supabase && !session ? (
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            theme="dark"
+            providers={["github"]}
+          />
+        ) : (
+          <p>Account page will go here.</p>
+        )}
+      </div> */}
       <h1 className="bold p-10 text-center text-4xl">
-        不定期タスクローテーション
+        <input type="text" value={title} className="text-center" />
       </h1>
       <div className="">
         <div className="flex justify-center">
@@ -102,3 +157,20 @@ export default function Home() {
     </main>
   );
 }
+
+// const Home = () => {
+//   return (
+//     <LayoutWrapper>
+// <Auth.UserContextProvider supabaseClient={supabase}>
+//   <Container>
+//     <div className="flex justify-center pt-8">
+//       <div className="w-full sm:w-96">
+//         <App></App>
+//       </div>
+//     </div>
+//   </Container>
+// </Auth.UserContextProvider>
+//     </LayoutWrapper>
+//   );
+// };
+// export default Home;

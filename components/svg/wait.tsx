@@ -1,7 +1,7 @@
 export const Wait = (): JSX.Element => {
   return (
     <>
-      <div className="mr-5">
+      <div className="mx-2">
         <svg
           width="199"
           height="212"

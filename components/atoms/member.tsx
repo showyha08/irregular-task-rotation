@@ -14,13 +14,14 @@ export const Member = ({
   const activeMember = <Pic></Pic>;
   const waitingMember = <Wait></Wait>;
   return (
-    <div>
+    <div className="">
       {isActive ? activeMember : waitingMember}
       <input
         type="text"
         placeholder="名前を入力してください"
         onChange={onChange}
         value={value}
+        className="text-center w-full"
       />
     </div>
   );
