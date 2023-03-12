@@ -14,23 +14,20 @@ import type { ReactNode } from "react";
 import React from "react";
 
 export default function Home() {
-  const session = useSession();
   type Props = {
     children: ReactNode;
   };
   const Container = (props: Props) => {
     const { user } = Auth.useUser();
-    // ログインしている場合
-    if (user) {
-      return (
-        <div>
-          <div>OK</div>
-          <div className="mx-2 my-4 flex justify-end"></div>
-        </div>
-      );
-    }
-    // ログインしていない場合
-    return props.children;
+    // ログイン済み
+    return user ? (
+      <div className="mx-2 my-4 flex justify-end">
+        <button onClick={() => supabase.auth.signOut()}>ログアウト</button>
+      </div>
+    ) : (
+      // 未ログイン
+      <>props.children</>
+    );
   };
   const App = () => (
     <Auth
@@ -61,10 +58,6 @@ export default function Home() {
   );
   let ref = useRef("");
 
-  function handleClick() {
-    console.log(ref.current.toString);
-  }
-
   const canCountDown: () => boolean = () => {
     return MIN_COUNT < memberCount && memberCount <= MAX_COUNT;
   };
@@ -93,7 +86,6 @@ export default function Home() {
           </div>
         </Container>
       </Auth.UserContextProvider>
-      <button onClick={() => supabase.auth.signOut()}>Sign out</button>;
       {/* <div className="container" style={{ padding: "50px 0 100px 0" }}>
         {supabase && !session ? (
           <Auth
@@ -117,7 +109,6 @@ export default function Home() {
                 key={x}
                 value={members[x]}
                 isActive={++x === activeMemberNo}
-                onChange={handleClick}
               ></Member>
             );
           })}

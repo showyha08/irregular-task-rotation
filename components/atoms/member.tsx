@@ -8,7 +8,7 @@ export const Member = ({
   value,
 }: {
   isActive: boolean;
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
   value: string;
 }): JSX.Element => {
   const activeMember = <Pic></Pic>;
@@ -21,7 +21,7 @@ export const Member = ({
         placeholder="名前を入力してください"
         onChange={onChange}
         value={value}
-        className="text-center w-full"
+        className="w-full text-center"
       />
     </div>
   );
