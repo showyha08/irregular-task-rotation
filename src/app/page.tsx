@@ -77,16 +77,17 @@ export default function Home() {
 
   return (
     <main className="">
-      <Auth.UserContextProvider supabaseClient={supabase}>
-        <Container>
-          <div className="flex justify-center pt-8">
-            <div className="w-full sm:w-96">
-              <App></App>
+      <section>
+        <Auth.UserContextProvider supabaseClient={supabase}>
+          <Container>
+            <div className="flex justify-center pt-8">
+              <div className="w-full sm:w-96">
+                <App></App>
+              </div>
             </div>
-          </div>
-        </Container>
-      </Auth.UserContextProvider>
-      {/* <div className="container" style={{ padding: "50px 0 100px 0" }}>
+          </Container>
+        </Auth.UserContextProvider>
+        {/* <div className="container" style={{ padding: "50px 0 100px 0" }}>
         {supabase && !session ? (
           <Auth
             supabaseClient={supabase}
@@ -98,53 +99,54 @@ export default function Home() {
           <p>Account page will go here.</p>
         )}
       </div> */}
-      <h1 className="bold p-10 text-center text-4xl">
-        <input type="text" value={title} className="text-center" />
-      </h1>
-      <div className="">
-        <div className="flex justify-center">
-          {[...Array(memberCount)].map((_, x) => {
-            return (
-              <Member
-                key={x}
-                value={members[x]}
-                isActive={++x === activeMemberNo}
-              ></Member>
-            );
-          })}
+        <h1 className="bold p-10 text-center text-4xl">
+          <input type="text" value={title} className="text-center" />
+        </h1>
+        <div className="">
+          <div className="flex justify-center">
+            {[...Array(memberCount)].map((_, x) => {
+              return (
+                <Member
+                  key={x}
+                  value={members[x]}
+                  isActive={++x === activeMemberNo}
+                ></Member>
+              );
+            })}
+          </div>
+          <div className="flex justify-center p-10">
+            <MemberController
+              onClickForMinus={() =>
+                setMembercount(() =>
+                  canCountDown() ? memberCount - 1 : memberCount
+                )
+              }
+              onClickForPlus={() =>
+                setMembercount(() =>
+                  canCountUp() ? memberCount + 1 : memberCount
+                )
+              }
+              disableClickForMinus={!canCountDown()}
+              disableClickForPlus={!canCountUp()}
+            >
+              {memberCount}
+            </MemberController>
+          </div>
+          <div className="flex justify-center p-10">
+            <ChangeButton
+              color="back"
+              onClick={() => activeMemberBack()}
+            ></ChangeButton>
+            <ChangeButton
+              color="next"
+              onClick={() => activeMemberNext()}
+            ></ChangeButton>
+          </div>
+          <div className="grid place-items-center p-10">
+            <ExportButton onClick={() => activeMemberNext()}></ExportButton>
+          </div>
         </div>
-        <div className="flex justify-center p-10">
-          <MemberController
-            onClickForMinus={() =>
-              setMembercount(() =>
-                canCountDown() ? memberCount - 1 : memberCount
-              )
-            }
-            onClickForPlus={() =>
-              setMembercount(() =>
-                canCountUp() ? memberCount + 1 : memberCount
-              )
-            }
-            disableClickForMinus={!canCountDown()}
-            disableClickForPlus={!canCountUp()}
-          >
-            {memberCount}
-          </MemberController>
-        </div>
-        <div className="flex justify-center p-10">
-          <ChangeButton
-            color="back"
-            onClick={() => activeMemberBack()}
-          ></ChangeButton>
-          <ChangeButton
-            color="next"
-            onClick={() => activeMemberNext()}
-          ></ChangeButton>
-        </div>
-        <div className="grid place-items-center p-10">
-          <ExportButton onClick={() => activeMemberNext()}></ExportButton>
-        </div>
-      </div>
+      </section>
     </main>
   );
 }

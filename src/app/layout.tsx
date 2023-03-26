@@ -18,7 +18,20 @@ export default function RootLayout({
           rel="stylesheet"
         /> */}
       </Head>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <header role="banner">タスク当番表</header>
+        <article>{children}</article>
+        <footer>
+          <aside>
+            <pre>
+              <small>(C) 2023 Showyha08</small>
+            </pre>
+          </aside>
+          <address>
+            <p>Japan</p>
+          </address>
+        </footer>
+      </body>
     </html>
   );
 }
