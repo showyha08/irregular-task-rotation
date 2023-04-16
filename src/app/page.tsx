@@ -3,40 +3,17 @@
 import { ChangeButton } from "components/atoms/changeButton";
 import MemberController from "components/molecules/memberController";
 import Member from "components/atoms/member";
-import { useEffect, useRef, useState } from "react";
-import ExportButton from "components/atoms/exportButton";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-// import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { supabase } from "../utils/supabaseClient";
 import type { ReactNode } from "react";
 import React from "react";
+import UrlCopyButton from "components/atoms/urlCopyButton";
 
 export default function Home() {
   type Props = {
     children: ReactNode;
   };
-  const Container = (props: Props) => {
-    const { user } = Auth.useUser();
-    // ログイン済み
-    return user ? (
-      <div className="mx-2 my-4 flex justify-end">
-        <button onClick={() => supabase.auth.signOut()}>ログアウト</button>
-      </div>
-    ) : (
-      // 未ログイン
-      <>props.children</>
-    );
-  };
-  const App = () => (
-    <Auth
-      supabaseClient={supabase}
-      appearance={{ theme: ThemeSupa }}
-      theme="dark"
-    />
-  );
-
   // メンバー許容人数設定
   const MIN_COUNT = 1;
   const MAX_COUNT = 5;
@@ -87,7 +64,7 @@ export default function Home() {
     // 新しいqueryパラメータを設定
     searchParams.set(urlParams.title, boardTitle);
     searchParams.set(urlParams.member, memberNames.join(","));
-    searchParams.set(urlParams.position, position.toString());
+    searchParams.set(urlParams.position, activeMemberNo.toString());
 
     // 新しいURLを作成
     const newUrl = `${currentUrl.split("?")[0]}?${searchParams.toString()}`;
@@ -106,22 +83,24 @@ export default function Home() {
     setActiveMemberNo(
       activeMemberNo - 1 < MIN_COUNT ? memberCount : activeMemberNo - 1
     );
-    updateUrl();
   };
   const activeMemberNext: () => void = () => {
     setActiveMemberNo(
       activeMemberNo + 1 > memberCount ? MIN_COUNT : activeMemberNo + 1
     );
-    updateUrl();
   };
 
-  const copyUrlForClipboard = () => {
-    navigator.clipboard.writeText(location.href);
+  // メンバー人数より担当者番号が大きい場合は担当者番号を更新する
+  const fixActiveMember: () => void = () => {
+    console.log(activeMemberNo);
+    console.log(memberCount);
+    setActiveMemberNo(
+      activeMemberNo > memberCount ? memberCount : activeMemberNo
+    );
   };
 
   const boardTitleChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBoardTitle(e.target.value);
-    updateUrl();
   };
 
   const memberNameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,41 +108,20 @@ export default function Home() {
     const newMemberNames: string[] = [...memberNames].map((name, index) => {
       return index === memberPosition ? e.target.value : name;
     });
-
-    // return index === memberPosition ? e.target.value : name;
-    //memberNames.splice(memberPosition, 1, e.target.value);
     setMemberNames(newMemberNames);
-    updateUrl();
   };
 
+  // queryStringsで利用するパラメータが更新された場合は副作用によりURLを更新する
   useEffect(() => {
-    console.log("Component has been re-rendered.");
-  }, [memberNames]);
+    fixActiveMember();
+    updateUrl();
+    // updateUrlは更新されないので、eslintのルールを無効化
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memberCount, memberNames, boardTitle, activeMemberNo]);
 
   return (
     <main className="">
       <section>
-        {/* <Auth.UserContextProvider supabaseClient={supabase}>
-          <Container>
-            <div className="flex justify-center pt-8">
-              <div className="w-full sm:w-96">
-                <App></App>
-              </div>
-            </div>
-          </Container>
-        </Auth.UserContextProvider> */}
-        {/* <div className="container" style={{ padding: "50px 0 100px 0" }}>
-        {supabase && !session ? (
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            theme="dark"
-            providers={["github"]}
-          />
-        ) : (
-          <p>Account page will go here.</p>
-        )}
-      </div> */}
         <h1 className="bold p-10 text-center text-4xl">
           <input
             type="text"
@@ -172,7 +130,7 @@ export default function Home() {
             className="text-center"
           />
         </h1>
-        <div className="">
+        <div>
           <div className="flex justify-center">
             {[...Array(memberCount)].map((_, x) => {
               return (
@@ -214,28 +172,8 @@ export default function Home() {
               onClick={() => activeMemberNext()}
             ></ChangeButton>
           </div>
-          <div className="grid place-items-center p-10">
-            <ExportButton onClick={() => copyUrlForClipboard()}></ExportButton>
-          </div>
         </div>
       </section>
     </main>
   );
 }
-
-// const Home = () => {
-//   return (
-//     <LayoutWrapper>
-// <Auth.UserContextProvider supabaseClient={supabase}>
-//   <Container>
-//     <div className="flex justify-center pt-8">
-//       <div className="w-full sm:w-96">
-//         <App></App>
-//       </div>
-//     </div>
-//   </Container>
-// </Auth.UserContextProvider>
-//     </LayoutWrapper>
-//   );
-// };
-// export default Home;
