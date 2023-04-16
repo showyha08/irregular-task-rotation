@@ -1,3 +1,4 @@
+import LinkIcon from "components/svg/linkIcon";
 import React, { MouseEventHandler } from "react";
 
 const ExportButton = ({

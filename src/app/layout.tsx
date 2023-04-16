@@ -19,12 +19,13 @@ export default function RootLayout({
         /> */}
       </Head>
       <body className="font-sans">
-        <header role="banner">タスク当番表</header>
+
+        {/* TODO:navの作成 <header>タスク当番表</header> */}
         <article>{children}</article>
         <footer>
           <aside>
             <pre>
-              <small>(C) 2023 Showyha08</small>
+              <small>(C) 2023 showyha08</small>
             </pre>
           </aside>
           <address>

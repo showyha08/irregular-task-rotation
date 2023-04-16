@@ -1,14 +1,14 @@
 "use client";
 
 import { ChangeButton } from "components/atoms/changeButton";
-import MemberController from "components/molcule/memberController";
+import MemberController from "components/molecules/memberController";
 import Member from "components/atoms/member";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ExportButton from "components/atoms/exportButton";
 import { useSearchParams } from "next/navigation";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+// import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { supabase } from "../utils/supabaseClient";
 import type { ReactNode } from "react";
 import React from "react";
@@ -45,18 +45,56 @@ export default function Home() {
     return MIN_COUNT <= x && x <= MAX_COUNT;
   };
 
+  // パラメータ設定
+  const urlParams = {
+    title: "title",
+    position: "position",
+    member: "member",
+  };
+
   // パラメータから状態を取得
   const searchParams = useSearchParams();
-  const title = searchParams.get("title") || "タスク当番表(変更可能)";
-  const position = searchParams.get("position");
-  const members: string[] = searchParams.get("member")?.split(",") || [];
-  const [memberCount, setMembercount] = useState(INIT_COUNT);
+  const title = searchParams.get(urlParams.title) || "タスク当番表";
+  const position = searchParams.get(urlParams.position) || 1;
+  const members: string[] = searchParams.get(urlParams.member)?.split(",") || [
+    "",
+    "",
+    "",
+  ];
+
+  // メンバー名設定
+  const [memberNames, setMemberNames] = useState(members);
+
+  // 表示人数設定
+  const [memberCount, setMemberCount] = useState(INIT_COUNT);
+
+  // 当番表タイトル設定
+  const [boardTitle, setBoardTitle] = useState(title);
 
   // クエリストリングでの位置指定
   const [activeMemberNo, setActiveMemberNo] = useState(
     (isInRange(Number(position)) && Number(position)) || 1
   );
-  let ref = useRef("");
+
+  // urlを更新
+  const updateUrl = () => {
+    // 現在のURLを取得
+    const currentUrl = window.location.href;
+
+    // 現在のqueryパラメータを取得
+    const searchParams = new URLSearchParams(window.location.search);
+
+    // 新しいqueryパラメータを設定
+    searchParams.set(urlParams.title, boardTitle);
+    searchParams.set(urlParams.member, memberNames.join(","));
+    searchParams.set(urlParams.position, position.toString());
+
+    // 新しいURLを作成
+    const newUrl = `${currentUrl.split("?")[0]}?${searchParams.toString()}`;
+
+    // 新しいURLに変更
+    window.history.pushState({ path: newUrl }, "", newUrl);
+  };
 
   const canCountDown: () => boolean = () => {
     return MIN_COUNT < memberCount && memberCount <= MAX_COUNT;
@@ -68,17 +106,44 @@ export default function Home() {
     setActiveMemberNo(
       activeMemberNo - 1 < MIN_COUNT ? memberCount : activeMemberNo - 1
     );
+    updateUrl();
   };
   const activeMemberNext: () => void = () => {
     setActiveMemberNo(
       activeMemberNo + 1 > memberCount ? MIN_COUNT : activeMemberNo + 1
     );
+    updateUrl();
   };
+
+  const copyUrlForClipboard = () => {
+    navigator.clipboard.writeText(location.href);
+  };
+
+  const boardTitleChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBoardTitle(e.target.value);
+    updateUrl();
+  };
+
+  const memberNameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const memberPosition = Number(e.target.id);
+    const newMemberNames: string[] = [...memberNames].map((name, index) => {
+      return index === memberPosition ? e.target.value : name;
+    });
+
+    // return index === memberPosition ? e.target.value : name;
+    //memberNames.splice(memberPosition, 1, e.target.value);
+    setMemberNames(newMemberNames);
+    updateUrl();
+  };
+
+  useEffect(() => {
+    console.log("Component has been re-rendered.");
+  }, [memberNames]);
 
   return (
     <main className="">
       <section>
-        <Auth.UserContextProvider supabaseClient={supabase}>
+        {/* <Auth.UserContextProvider supabaseClient={supabase}>
           <Container>
             <div className="flex justify-center pt-8">
               <div className="w-full sm:w-96">
@@ -86,7 +151,7 @@ export default function Home() {
               </div>
             </div>
           </Container>
-        </Auth.UserContextProvider>
+        </Auth.UserContextProvider> */}
         {/* <div className="container" style={{ padding: "50px 0 100px 0" }}>
         {supabase && !session ? (
           <Auth
@@ -100,16 +165,23 @@ export default function Home() {
         )}
       </div> */}
         <h1 className="bold p-10 text-center text-4xl">
-          <input type="text" value={title} className="text-center" />
+          <input
+            type="text"
+            value={boardTitle}
+            onChange={boardTitleChangeHandler}
+            className="text-center"
+          />
         </h1>
         <div className="">
           <div className="flex justify-center">
             {[...Array(memberCount)].map((_, x) => {
               return (
                 <Member
+                  id={x.toString()}
                   key={x}
-                  value={members[x]}
+                  value={memberNames[x]}
                   isActive={++x === activeMemberNo}
+                  onChange={memberNameChangeHandler}
                 ></Member>
               );
             })}
@@ -117,12 +189,12 @@ export default function Home() {
           <div className="flex justify-center p-10">
             <MemberController
               onClickForMinus={() =>
-                setMembercount(() =>
+                setMemberCount(() =>
                   canCountDown() ? memberCount - 1 : memberCount
                 )
               }
               onClickForPlus={() =>
-                setMembercount(() =>
+                setMemberCount(() =>
                   canCountUp() ? memberCount + 1 : memberCount
                 )
               }
@@ -143,7 +215,7 @@ export default function Home() {
             ></ChangeButton>
           </div>
           <div className="grid place-items-center p-10">
-            <ExportButton onClick={() => activeMemberNext()}></ExportButton>
+            <ExportButton onClick={() => copyUrlForClipboard()}></ExportButton>
           </div>
         </div>
       </section>
