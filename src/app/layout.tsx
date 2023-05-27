@@ -2,6 +2,7 @@ import UrlCopyButton from "components/atoms/urlCopyButton";
 import ResetButton from "components/atoms/resetButton";
 import Head from "next/head";
 import "./globals.css";
+import React from "react";
 
 export default function RootLayout({
   children,
@@ -23,7 +24,7 @@ export default function RootLayout({
           </p>
           <div className="flex justify-between [&>*]:mr-4">
             <ResetButton></ResetButton>
-            <urlCopyButton></urlCopyButton>
+            <UrlCopyButton></UrlCopyButton>
           </div>
         </header>
         <article>{children}</article>
