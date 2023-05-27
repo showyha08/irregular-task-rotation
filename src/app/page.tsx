@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Auth } from "@supabase/auth-ui-react";
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import React from "react";
 import UrlCopyButton from "components/atoms/urlCopyButton";
 
@@ -31,9 +32,9 @@ export default function Home() {
 
   // パラメータから状態を取得
   const searchParams = useSearchParams();
-  const title = searchParams.get(urlParams.title) || "タスク当番表";
-  const position = searchParams.get(urlParams.position) || 1;
-  const members: string[] = searchParams.get(urlParams.member)?.split(",") || [
+  const title = searchParams?.get(urlParams.title) || "タスク当番表";
+  const position = searchParams?.get(urlParams.position) || 1;
+  const members: string[] = searchParams?.get(urlParams.member)?.split(",") || [
     "",
     "",
     "",
